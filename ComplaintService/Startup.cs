@@ -1,7 +1,10 @@
+using ComplaintService.Authorization;
 using ComplaintService.DataContext;
 using ComplaintService.Interfaces;
 using ComplaintService.Provider;
 using ComplaintService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,10 +14,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ComplaintService
@@ -49,6 +54,30 @@ namespace ComplaintService
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ComplaintService", Version = "v1" });
             });
 
+
+
+            //var tokenValidatorParameters = new TokenValidationParameters
+            //{
+            //    ValidateIssuerSigningKey = true,
+            //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+            //    ValidateIssuer = false,
+            //    ValidateAudience = false,
+            //    RequireExpirationTime = false,
+            //    ValidateLifetime = true,
+            //};
+
+            //services.AddSingleton(tokenValidatorParameters);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.SaveToken = true;
+                //x.TokenValidationParameters = tokenValidatorParameters;
+            });
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("mabel", policy =>
@@ -56,6 +85,7 @@ namespace ComplaintService
                     policy.AddRequirements(new AuthorizationRequirement("mabel.com"));
                 });
             });
+            services.AddSingleton<IAuthorizationHandler, WorkAuthorizationHandlers>();
             services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v2", new OpenApiInfo
                 {
