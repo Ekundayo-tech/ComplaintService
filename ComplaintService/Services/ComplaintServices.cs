@@ -21,7 +21,7 @@ namespace ComplaintService.Services
         public ComplaintDto AddUpdate(ComplaintModel model)
         {
 
-            var res =  _db.Complaint.FirstOrDefault(x => x.UserId == model.UserId);
+            var res =  _db.Complaint.FirstOrDefault(x => x.Id == model.Id);
             if (res == null)
             {
                 res = new Complaint()
