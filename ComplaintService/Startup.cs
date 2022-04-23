@@ -1,6 +1,7 @@
 using ComplaintService.Authorization;
 using ComplaintService.DataContext;
 using ComplaintService.Interfaces;
+using ComplaintService.JwtOptions;
 using ComplaintService.Provider;
 using ComplaintService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -53,20 +54,23 @@ namespace ComplaintService
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ComplaintService", Version = "v1" });
             });
+             
+
+            var jwtSettings = new JwtOption();
+            Configuration.Bind(nameof(jwtSettings), jwtSettings);
+            services.AddSingleton(jwtSettings);
 
 
-
-            //var tokenValidatorParameters = new TokenValidationParameters
-            //{
-            //    ValidateIssuerSigningKey = true,
-            //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-            //    ValidateIssuer = false,
-            //    ValidateAudience = false,
-            //    RequireExpirationTime = false,
-            //    ValidateLifetime = true,
-            //};
-
-            //services.AddSingleton(tokenValidatorParameters);
+            var tokenValidatorParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                RequireExpirationTime = false,
+                ValidateLifetime = true,
+            };
+            services.AddSingleton(tokenValidatorParameters);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -75,7 +79,7 @@ namespace ComplaintService
             }).AddJwtBearer(x =>
             {
                 x.SaveToken = true;
-                //x.TokenValidationParameters = tokenValidatorParameters;
+                x.TokenValidationParameters = tokenValidatorParameters;
             });
 
             services.AddAuthorization(options =>

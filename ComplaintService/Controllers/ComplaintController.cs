@@ -42,7 +42,7 @@ namespace ComplaintService.Controllers
         }
 
         [HttpGet("api/complain/get/{id}")]
-        public ActionResult<List<ComplaintDto>> GetBy(int id)
+        public ActionResult<List<ComplaintDto>> GetBy(Guid id)
         {
             try
             {

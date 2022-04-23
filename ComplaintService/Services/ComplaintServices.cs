@@ -4,6 +4,7 @@ using ComplaintService.DataModel;
 using ComplaintService.Dtos;
 using ComplaintService.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +18,10 @@ namespace ComplaintService.Services
         {
             _db = db;
         }
-        public async Task<ComplaintDto> AddUpdate(ComplaintModel model)
+        public ComplaintDto AddUpdate(ComplaintModel model)
         {
 
-            var res = await _db.Complaint.SingleOrDefaultAsync(x => x.UserId == model.UserId);
+            var res =  _db.Complaint.FirstOrDefault(x => x.UserId == model.UserId);
             if (res == null)
             {
                 res = new Complaint()
@@ -29,7 +30,7 @@ namespace ComplaintService.Services
                     ComplaintDescription = model.ComplaintDescription,
                     IsDeleted = model.IsDeleted
                 };
-                await _db.Complaint.AddAsync(res);
+                 _db.Complaint.Add(res);
             }
             else
             {
@@ -37,13 +38,13 @@ namespace ComplaintService.Services
                 res.UserId = model.UserId;
                 res.ComplaintDescription = model.ComplaintDescription;
             }
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
             return new ComplaintDto { ComplaintDescription = res.ComplaintDescription, UserId = res.UserId, Id = res.Id, IsDeleted = res.IsDeleted};
         }
 
-        public async Task<ComplaintDto> Get(int Id)
+        public ComplaintDto Get(Guid Id)
         {
-            var res = await _db.Complaint.SingleOrDefaultAsync(x => x.Id == Id);
+            var res =  _db.Complaint.FirstOrDefault(x => x.Id == Id);
             if(res != null)
             {
                 return new ComplaintDto { Id = res.Id, UserId = res.UserId, ComplaintDescription = res.ComplaintDescription, IsDeleted = res.IsDeleted };
@@ -51,9 +52,9 @@ namespace ComplaintService.Services
             return null;
         }
 
-        public async Task<List<Complaint>> GetAll()
+        public List<Complaint> GetAll()
         {
-            return await _db.Complaint.Where(x => x.IsDeleted == false).ToListAsync();
+            return  _db.Complaint.Where(x => x.IsDeleted == false).ToList();
         }
     }
 }

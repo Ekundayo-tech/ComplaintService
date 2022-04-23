@@ -9,8 +9,8 @@ namespace ComplaintService.Provider
 {
     public interface IAuthProvider
     {  
-        Task<AuthResult> Login(LoginModel model); 
-        Task<AuthResult> Register(RegisterModel model); 
+        AuthResult Login(LoginModel model); 
+        AuthResult Register(RegisterModel model); 
 
 
     }
@@ -23,9 +23,9 @@ namespace ComplaintService.Provider
             _service = service;
         }
 
-        public async Task<AuthResult> Login(LoginModel model )
+        public AuthResult Login(LoginModel model )
         {
-            var response = await _service.Post<AuthResult>("api/Auth/api/v1/login", model);
+            var response =  _service.Post<AuthResult>("api/Auth/api/v1/login", model);
 
             if (response == null)
             {
@@ -35,12 +35,12 @@ namespace ComplaintService.Provider
                 };
             }
 
-            return response;
+            return response.Result;
         }
 
-        public async Task<AuthResult> Register(RegisterModel model )
+        public AuthResult Register(RegisterModel model )
         {
-            var response = await _service.Post<AuthResult>("api/Auth/api/v1/register", model);
+            var response =   _service.Post<AuthResult>("api/Auth/api/v1/register", model);
             if(response == null)
             {
                 return new AuthResult
@@ -48,7 +48,7 @@ namespace ComplaintService.Provider
                     ErrorMessage = new[] { "registration failed" }
                 };
             }
-            return response;
+            return response.Result;
         }
     }
 }
